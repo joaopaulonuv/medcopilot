@@ -5,7 +5,8 @@ An advanced healthcare application that records patient-doctor conversations, au
 ## 🚀 Features
 
 - **🎙️ High-quality audio recording** with native Expo Audio
-- **📝 Automatic transcription** using OpenAI Whisper
+- **📝 Local audio transcription** with 10-second chunk processing
+- **🔄 Real-time transcription** with live text updates
 - **🧠 AI-powered medical analysis** with GPT-4
 - **⚡ Real-time clinical insights** extraction
 - **🔒 LGPD/HIPAA compliant** security measures
@@ -31,6 +32,14 @@ An advanced healthcare application that records patient-doctor conversations, au
     │   └── utils/               # Helper functions
     └── package.json
 ```
+
+## 🎙️ Audio Processing Flow
+
+1. **Frontend Transcription**: Audio is processed locally on the device
+2. **10-Second Chunks**: Live recording processes audio every 10 seconds
+3. **Text-Only Backend**: Only transcribed text is sent to the server
+4. **AI Analysis**: GPT-4 analyzes the text for medical insights
+5. **Secure Storage**: Results stored locally with export options
 
 ## 🛠️ Installation & Setup
 
@@ -97,7 +106,7 @@ Configure the backend URL in the Settings tab:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for Whisper & GPT | Yes |
+| `OPENAI_API_KEY` | OpenAI API key for GPT analysis | Yes |
 | `PORT` | Server port (default: 3000) | No |
 | `NODE_ENV` | Environment (development/production) | Yes |
 | `ALLOWED_ORIGINS` | CORS allowed origins | No |
@@ -105,15 +114,16 @@ Configure the backend URL in the Settings tab:
 ## 🔒 Security & Privacy
 
 ### Data Protection
-- ✅ Audio files are processed securely and deleted after analysis
-- ✅ No permanent storage of patient data
+- ✅ Audio transcription happens locally on device
+- ✅ Only text data is sent to backend (no audio files)
+- ✅ No permanent storage of patient data on server
 - ✅ End-to-end encryption ready for production
 - ✅ Rate limiting and input validation
 - ✅ CORS protection and security headers
 
 ### LGPD/HIPAA Compliance
 - 🔐 **Data Minimization**: Only necessary data is processed
-- 🗑️ **Right to Deletion**: Audio files are automatically deleted
+- 🗑️ **Right to Deletion**: No audio files stored on server
 - 🔒 **Data Security**: Industry-standard encryption
 - 📋 **Audit Trail**: All operations are logged
 - 🚫 **No Data Sharing**: No third-party data sharing
@@ -129,22 +139,6 @@ Configure the backend URL in the Settings tab:
 ## 📋 API Documentation
 
 ### Endpoints
-
-#### `POST /api/transcribe`
-Transcribe audio file to text.
-
-**Request:**
-- Content-Type: `multipart/form-data`
-- Body: `audio` file (MP3, M4A, WAV, MP4)
-
-**Response:**
-```json
-{
-  "transcription": "Texto da conversa transcrita...",
-  "duration": 120000,
-  "timestamp": "2024-01-01T12:00:00.000Z"
-}
-```
 
 #### `POST /api/analyze`
 Analyze medical consultation transcription.
@@ -182,6 +176,19 @@ Health check endpoint.
 }
 ```
 
+## 🎯 Recording Modes
+
+### Single Recording Mode
+- Record complete consultation
+- Transcribe locally after recording
+- Send full text for analysis
+
+### Live Mode (10-second chunks)
+- Continuous recording with real-time transcription
+- Process audio every 10 seconds
+- Build complete transcription progressively
+- Immediate feedback and live text display
+
 ## 🚀 Deployment
 
 ### Frontend (Expo)
@@ -215,7 +222,8 @@ npm test
 
 ### Manual Testing Checklist
 - [ ] Audio recording works on device
-- [ ] Transcription returns accurate text
+- [ ] Local transcription processes correctly
+- [ ] 10-second chunk processing works
 - [ ] Medical analysis extracts relevant data
 - [ ] Error handling works properly
 - [ ] Settings are saved correctly
