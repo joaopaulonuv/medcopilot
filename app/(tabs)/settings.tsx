@@ -23,7 +23,7 @@ import {
 import { ConfigService } from '../../services/ConfigService';
 
 export default function SettingsScreen() {
-  const [serverUrl, setServerUrl] = useState('http://localhost:3000');
+  const [serverUrl, setServerUrl] = useState('https://ecuador-authority-meal-simplified.trycloudflare.com');
   const [autoAnalysis, setAutoAnalysis] = useState(true);
   const [highQualityAudio, setHighQualityAudio] = useState(true);
   const [notifications, setNotifications] = useState(true);
@@ -97,7 +97,7 @@ export default function SettingsScreen() {
                 style={styles.textInput}
                 value={serverUrl}
                 onChangeText={setServerUrl}
-                placeholder="http://localhost:3000"
+                placeholder="https://ecuador-authority-meal-simplified.trycloudflare.com"
                 autoCapitalize="none"
                 autoCorrect={false}
               />

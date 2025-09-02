@@ -15,25 +15,24 @@ const openai = new OpenAI({
 });
 
 // Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const tempDir = 'temp/';
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir);
+    }
+    cb(null, tempDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+  }
+});
+
 const upload = multer({
-  dest: 'temp/',
+  storage: storage,
   limits: {
     fileSize: 25 * 1024 * 1024, // 25MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = process.env.ALLOWED_AUDIO_TYPES?.split(',') || [
-      'audio/mp4',
-      'audio/m4a', 
-      'audio/wav',
-      'audio/mpeg'
-    ];
-    
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid audio format'), false);
-    }
-  },
+  }
 });
 
 /**

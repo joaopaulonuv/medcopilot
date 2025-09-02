@@ -11,7 +11,7 @@ export class ConfigService {
   private static readonly CONFIG_KEY = 'app_config';
   
   private static readonly defaultConfig: AppConfig = {
-    serverUrl: 'http://localhost:3000',
+    serverUrl: 'https://ecuador-authority-meal-simplified.trycloudflare.com',
     autoAnalysis: true,
     highQualityAudio: true,
     notifications: true,

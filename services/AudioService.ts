@@ -1,7 +1,68 @@
+import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import { ConfigService } from './ConfigService';
 
 export class AudioService {
+  private static recording: Audio.Recording | null = null;
+
+  static async requestPermissions(): Promise<boolean> {
+    const { status } = await Audio.requestPermissionsAsync();
+    return status === 'granted';
+  }
+
+  static async startRecording(): Promise<void> {
+    try {
+      const hasPermission = await this.requestPermissions();
+      if (!hasPermission) {
+        throw new Error('Microphone permission not granted');
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync({
+        ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        android: {
+          extension: '.m4a',
+          outputFormat: 2, // MPEG_4
+          audioEncoder: 3, // AAC
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+        },
+        ios: {
+          extension: '.m4a',
+          outputFormat: 'mpeg4',
+          audioQuality: 127, // Max quality
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+        },
+      });
+      this.recording = recording;
+    } catch (err) {
+      console.error('Failed to start recording', err);
+      throw new Error('Could not start recording.');
+    }
+  }
+
+  static async stopRecording(): Promise<string | null> {
+    if (!this.recording) {
+      return null;
+    }
+
+    try {
+      await this.recording.stopAndUnloadAsync();
+      const uri = this.recording.getURI();
+      this.recording = null;
+      return uri;
+    } catch (error) {
+      console.error('Failed to stop recording:', error);
+      throw new Error('Could not stop recording.');
+    }
+  }
   static async uploadAndTranscribe(audioUri: string): Promise<string> {
     try {
       const config = await ConfigService.getConfig();

@@ -90,7 +90,7 @@ An advanced healthcare application that records patient-doctor conversations, au
 ### App Settings
 
 Configure the backend URL in the Settings tab:
-- **Development**: `http://localhost:3000`
+- **Development**: `https://ecuador-authority-meal-simplified.trycloudflare.com`
 - **Production**: Your deployed server URL
 
 ### Backend Environment Variables
