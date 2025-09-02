@@ -153,6 +153,41 @@ export class AudioService {
     return simulatedResponses[randomIndex];
   }
 
+  static async uploadAndTranscribe(audioUri: string): Promise<string> {
+    try {
+      // For single recording upload and transcription
+      // This simulates local transcription - in production you'd use a proper speech-to-text service
+      
+      console.log('🎙️ Processing audio file locally...');
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Simulated full transcription for demo
+      const fullTranscription = `
+        Médico: Bom dia, como posso ajudá-lo hoje?
+        Paciente: Doutor, estou com uma dor de cabeça muito forte há três dias.
+        Médico: Pode me descrever melhor essa dor?
+        Paciente: É uma dor latejante, principalmente do lado direito da cabeça.
+        Médico: Tem febre?
+        Paciente: Sim, desde ontem à noite, mediu 38.5 graus.
+        Médico: Está tomando algum medicamento?
+        Paciente: Tomei paracetamol, mas não melhorou muito.
+        Médico: Tem náuseas ou vômitos?
+        Paciente: Sim, algumas vezes, principalmente de manhã.
+        Médico: Há histórico de enxaqueca na família?
+        Paciente: Sim, minha mãe sempre teve enxaqueca.
+        Médico: Vou examinar você. A pressão está normal. Vou prescrever um analgésico mais forte e quero que retorne em 48 horas se não melhorar.
+      `.trim();
+
+      return fullTranscription;
+      
+    } catch (error) {
+      console.error('Audio transcription failed:', error);
+      throw new Error('Failed to transcribe audio. Please try again.');
+    }
+  }
+
   static async uploadTranscriptionOnly(transcriptionText: string): Promise<any> {
     try {
       const config = await ConfigService.getConfig();

@@ -2,10 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { MedicalAnalysis } from './AnalysisService';
+import { TranscriptionChunk } from './AudioService';
 
 export class StorageService {
   private static readonly ANALYSIS_KEY = 'medical_analysis';
   private static readonly CONFIG_KEY = 'app_config';
+  private static readonly CHUNKS_KEY = 'transcription_chunks';
 
   static async saveAnalysis(analysis: MedicalAnalysis): Promise<void> {
     try {
@@ -29,6 +31,40 @@ export class StorageService {
     } catch (error) {
       console.error('Failed to load analysis:', error);
       return null;
+    }
+  }
+
+  static async saveTranscriptionChunk(chunk: TranscriptionChunk): Promise<void> {
+    try {
+      const existingChunks = await this.getTranscriptionChunks();
+      const updatedChunks = [...existingChunks, chunk];
+      
+      await AsyncStorage.setItem(this.CHUNKS_KEY, JSON.stringify(updatedChunks));
+    } catch (error) {
+      console.error('Failed to save transcription chunk:', error);
+    }
+  }
+
+  static async getTranscriptionChunks(): Promise<TranscriptionChunk[]> {
+    try {
+      const chunksData = await AsyncStorage.getItem(this.CHUNKS_KEY);
+      
+      if (!chunksData) {
+        return [];
+      }
+
+      return JSON.parse(chunksData) as TranscriptionChunk[];
+    } catch (error) {
+      console.error('Failed to load transcription chunks:', error);
+      return [];
+    }
+  }
+
+  static async clearTranscriptionChunks(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(this.CHUNKS_KEY);
+    } catch (error) {
+      console.error('Failed to clear transcription chunks:', error);
     }
   }
 
@@ -75,6 +111,12 @@ ${analysis.medications.length > 0 ? analysis.medications.map(med => `• ${med}`
 CLINICAL RECOMMENDATIONS
 ${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}
 
+TRANSCRIPTION TIMELINE
+${analysis.chunks.length > 0 ? 
+  analysis.chunks.map((chunk, index) => 
+    `[${new Date(chunk.timestamp).toLocaleTimeString()}] ${chunk.text}`
+  ).join('\n') : 'No timeline data available'}
+
 FULL TRANSCRIPTION
 ${analysis.transcription}
 
@@ -86,7 +128,7 @@ Report ID: ${analysis.timestamp}
 
   static async clearAllData(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([this.ANALYSIS_KEY, this.CONFIG_KEY]);
+      await AsyncStorage.multiRemove([this.ANALYSIS_KEY, this.CONFIG_KEY, this.CHUNKS_KEY]);
     } catch (error) {
       console.error('Failed to clear data:', error);
       throw new Error('Failed to clear application data');

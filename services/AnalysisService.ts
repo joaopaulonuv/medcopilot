@@ -1,6 +1,6 @@
 import { ConfigService } from './ConfigService';
 import { StorageService } from './StorageService';
-import { AudioService, TranscriptionChunk } from './AudioService';
+import { TranscriptionChunk } from './AudioService';
 
 export interface MedicalAnalysis {
   symptoms: string[];
@@ -21,7 +21,7 @@ export class AnalysisService {
   ): Promise<MedicalAnalysis> {
     try {
       // Send only transcription text to backend for analysis
-      const analysisResult = await AudioService.uploadTranscriptionOnly(transcription);
+      const analysisResult = await this.sendTranscriptionForAnalysis(transcription);
       
       // Add timestamp
       const analysis: MedicalAnalysis = {
@@ -39,6 +39,33 @@ export class AnalysisService {
     } catch (error) {
       console.error('Medical analysis failed:', error);
       throw new Error('Failed to analyze consultation. Please try again.');
+    }
+  }
+
+  private static async sendTranscriptionForAnalysis(transcriptionText: string): Promise<any> {
+    try {
+      const config = await ConfigService.getConfig();
+      
+      const response = await fetch(`${config.serverUrl}/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcription: transcriptionText,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+
+      return await response.json();
+      
+    } catch (error) {
+      console.error('Transcription analysis failed:', error);
+      throw new Error('Failed to send transcription for analysis. Please check your connection.');
     }
   }
 

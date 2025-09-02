@@ -7,18 +7,7 @@ const errorHandler = (err, req, res, next) => {
     timestamp: new Date().toISOString(),
   });
 
-  // Multer errors
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({
-      error: 'File too large. Maximum size is 25MB.'
-    });
-  }
 
-  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-    return res.status(400).json({
-      error: 'Unexpected file upload. Please upload audio files only.'
-    });
-  }
 
   // OpenAI errors
   if (err.message.includes('openai')) {

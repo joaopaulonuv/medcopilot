@@ -6,7 +6,6 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const transcribeRoutes = require('./routes/transcribe');
 const analyzeRoutes = require('./routes/analyze');
 const healthRoutes = require('./routes/health');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -46,7 +45,6 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '1mb' }));
 
 // Routes
-app.use('/api', transcribeRoutes);
 app.use('/api', analyzeRoutes);
 app.use('/api', healthRoutes);
 
@@ -59,7 +57,6 @@ app.use('*', (req, res) => {
     error: 'Endpoint not found',
     availableEndpoints: [
       'GET /api/health',
-      'POST /api/transcribe',
       'POST /api/analyze'
     ]
   });
